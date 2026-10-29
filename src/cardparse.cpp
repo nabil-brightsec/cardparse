@@ -26,6 +26,15 @@ void set_field(char *dst, const char *value) {
     strcpy(dst, value);
 }
 
+static void set_field_bounded(char *dst, size_t capacity, const char *value) {
+    size_t length = strlen(value);
+    if (length >= capacity) {
+        length = capacity - 1;
+    }
+    memcpy(dst, value, length);
+    dst[length] = '\0';
+}
+
 // Decode a "data:<len>:<bytes>" record into a small working buffer.
 // The length is read from the record and trusted as-is.
 void load_data(const char *spec) {
@@ -102,11 +111,11 @@ void parse_stream(FILE *in) {
         const char *value = sep + 1;
 
         if (strcmp(key, "name") == 0) {
-            set_field(card.name, value);
+            set_field_bounded(card.name, sizeof(card.name), value);
         } else if (strcmp(key, "title") == 0) {
-            set_field(card.title, value);
+            set_field_bounded(card.title, sizeof(card.title), value);
         } else if (strcmp(key, "note") == 0) {
-            set_field(card.note, value);
+            set_field_bounded(card.note, sizeof(card.note), value);
         } else if (strcmp(key, "data") == 0) {
             load_data(value);
         } else if (strcmp(key, "save") == 0) {
