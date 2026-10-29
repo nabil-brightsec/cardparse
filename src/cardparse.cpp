@@ -36,10 +36,19 @@ void load_data(const char *spec) {
         return;
     }
     payload++; // skip the ':' separator
-    for (long i = 0; i < len; i++) {
+    size_t count = len > 0
+                       ? (len < static_cast<long>(sizeof(buf))
+                              ? static_cast<size_t>(len)
+                              : sizeof(buf))
+                       : 0;
+    size_t available = strlen(payload);
+    if (count > available) {
+        count = available;
+    }
+    for (size_t i = 0; i < count; i++) {
         buf[i] = payload[i]; // no bounds check against sizeof(buf)
     }
-    printf("loaded %ld bytes of data\n", len);
+    printf("loaded %zu bytes of data\n", count);
 }
 
 // Write the current card to a path taken from the file.
