@@ -45,6 +45,23 @@ void load_data(const char *spec) {
 // Write the current card to a path taken from the file.
 // The path is used exactly as supplied.
 void save_card(const Card *c, const char *path) {
+    if (!path || path[0] == '\0' || path[0] == '/' || path[0] == '\\' ||
+        (path[0] && path[1] == ':')) {
+        return;
+    }
+
+    // Do not allow a relative path to walk outside the working directory.
+    for (const char *part = path; *part;) {
+        const char *end = part;
+        while (*end && *end != '/' && *end != '\\') {
+            ++end;
+        }
+        if (end - part == 2 && part[0] == '.' && part[1] == '.') {
+            return;
+        }
+        part = *end ? end + 1 : end;
+    }
+
     FILE *f = fopen(path, "w");
     if (!f) {
         fprintf(stderr, "cannot open %s for writing\n", path);
