@@ -20,12 +20,6 @@ void trim_newline(char *s) {
     }
 }
 
-// Copy a field value into a fixed destination buffer.
-// The value length is never checked against the destination size.
-void set_field(char *dst, const char *value) {
-    strcpy(dst, value);
-}
-
 static void set_field_bounded(char *dst, size_t capacity, const char *value) {
     size_t length = strlen(value);
     if (length >= capacity) {
@@ -33,6 +27,12 @@ static void set_field_bounded(char *dst, size_t capacity, const char *value) {
     }
     memcpy(dst, value, length);
     dst[length] = '\0';
+}
+
+// Copy a field value into a fixed destination buffer.
+// The value length is never checked against the destination size.
+void set_field(char *dst, const char *value) {
+    set_field_bounded(dst, sizeof(Card{}.name), value);
 }
 
 // Decode a "data:<len>:<bytes>" record into a small working buffer.
